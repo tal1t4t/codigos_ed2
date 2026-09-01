@@ -10,6 +10,7 @@ typedef struct item{
     struct item* pai;
     int valor;
     int fb;
+    int contador;
     struct item* filho_direita;
     struct item* filho_esquerda;
 }no;
@@ -17,60 +18,56 @@ typedef struct item{
 no* cria_no(){//pra quando inicializo uma árvore vazia
     no* novo = new no;
     novo->fb = 0;
-    novo->pai = NULL;
-    novo->filho_esquerda = NULL;
-    novo->filho_direita = NULL;
+    novo->pai = nullptr;
+    novo->filho_esquerda = nullptr;
+    novo->filho_direita = nullptr;
     return novo;
 }
 
 no* cria_arv_vazia(){
-    return NULL;
+    return nullptr;
 }
 
 int arvore_vazia(no* n){
-    return n == NULL;
+    return n == nullptr;
 }
 
 int e_folha(no* n){
-    return n->filho_direita == NULL && n->filho_esquerda == NULL;
+    return n->filho_direita == nullptr && n->filho_esquerda == nullptr;
 }
 
 void altera_fatores(no* n, int lado){
- if (n->pai == NULL) {
     if (lado == -1) {
         (n->fb)--;
     }
     else {
         (n->fb)++;
     }
- }
- else {
-    altera_fatores(n->pai, int n->lado);
- }
+    if (n->pai != nullptr) {
+        altera_fatores(n->pai, n->lado);
+    }
 }
 
 void procura_pai(no* n, no* novo){
     no* atual = n;
     while (true) {
         if (novo->valor >= atual->valor) {
-            if (atual->filho_direita != NULL) {
+            if (atual->filho_direita != nullptr) {
                 atual = atual->filho_direita;
             }
             else {
                 atual->filho_direita = novo;
                 novo->lado = -1;
-                (atual->fb)--;
                 break;
             }
         }
         else {
-            if (atual->filho_esquerda != NULL) {
+            if (atual->filho_esquerda != nullptr) {
                 atual = atual->filho_esquerda;
             }
             else {
                 atual->filho_esquerda = novo;   
                 novo->lado = 1;
-                (atual->fb)++;
                 break;        
             }
         }
@@ -84,57 +81,46 @@ void procura_pai(no* n, no* novo){
 
 // }
 
-// int fb(no* item){
-//     if (e_folha(item)) {
-//         item->fb = 0;
-//         return 0;
-//     }
-//     return 1 + max(fb(item->filho_direita), fb(item->filho_esquerda));
-// }
 
 void insere(int valor, no* &n){ // n é o primeiro nó da árvore em qualquer situação
     if (arvore_vazia(n)){
         n = cria_no();
         n->valor = valor;
-        cout << "valor " << valor << " inserido" << endl
-        << "Altura = " << n->fb << endl;
     }else {
         no* novo = new no;
         novo->valor = valor;
-        novo->filho_direita = NULL;
-        novo->filho_esquerda = NULL;
+        novo->filho_direita = nullptr;
+        novo->filho_esquerda = nullptr;
         novo->fb = 0;
         procura_pai(n, novo);
+
+
         // novo->fb = fb(novo);
 
-        cout << "valor " << valor << " inserido" << endl
-        << "Pai: " << novo->pai->valor << endl
-        << "FB: " << novo->fb << endl
-        << "FB do pai: " << novo->pai->fb << endl;
-
-
         // cout << "valor " << valor << " inserido" << endl
-        // << "Altura = " << novo->altura << endl
-        // << "Pai: " << novo->pai->valor << endl;
+        // << "Pai: " << novo->pai->valor << endl
+        // << "FB: " << novo->fb << endl
+        // << "FB do pai: " << novo->pai->fb << endl;
+
         // balancear(n);
     }
 
 
 }
 
-// void mostra(no* n){
-//     if (e_folha(n)) {
-//         cout << "valor " << n->valor << endl
-//         << "Altura = " << n->altura << endl
-//         << "Pai: " << (n->pai)->valor << endl;
-//     }
-//     if (n->filho_esquerda != NULL) {
-//         mostra(n->filho_esquerda);
-//     }else {
-//         mostra(n->filho_direita);
-//     }
+void mostra(no* n){
+    no* aux = n;
+    while (aux != nullptr) {
+        cout << "valor " << aux->valor << endl 
+        << "FB: " << aux->fb << endl;
 
-// }
+        if (aux->pai != nullptr) {
+            cout << "Pai: " << aux->pai->valor << endl
+            << "FB do pai: " << aux->pai->fb << endl << endl;
+        }
+        aux = aux->filho_esquerda;
+    }
+}
 
 int main(){
     no* n = cria_arv_vazia();
@@ -143,8 +129,8 @@ int main(){
     cin >> v;
     while (v != -1){
         insere(v, n);
+        mostra(n);
         cout << "Insira um valor: " << endl;
         cin >> v;        
-        // mostra(n);
     }
 }
