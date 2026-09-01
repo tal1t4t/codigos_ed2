@@ -15,6 +15,10 @@ typedef struct item{
     struct item* filho_esquerda;
 }no;
 
+typedef struct Arvore{
+    no* raiz;
+}arvore;
+
 no* cria_no(){//pra quando inicializo uma árvore vazia
     no* novo = new no;
     novo->fb = 0;
@@ -25,6 +29,10 @@ no* cria_no(){//pra quando inicializo uma árvore vazia
 }
 
 no* cria_arv_vazia(){
+    return nullptr;
+}
+
+arvore* cria_raiz_vazia(){
     return nullptr;
 }
 
@@ -87,6 +95,11 @@ void insere(int valor, no* &n){ // n é o primeiro nó da árvore em qualquer si
         n = cria_no();
         n->valor = valor;
     }else {
+        no* aux = n;
+        
+
+
+
         no* novo = new no;
         novo->valor = valor;
         novo->filho_direita = nullptr;
