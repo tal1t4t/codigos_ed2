@@ -4,26 +4,22 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
+
 
 typedef struct item {
     int lado; // -1 direita, 1 esquerda
-
     struct item* pai;
-
     string valor;
-
     int fb;
     int contador;
-
     vector<int> linhas;
-
     struct item* filho_direita;
     struct item* filho_esquerda;
-
 } no;
-
 
 // ======================================================
 // CRIAÇÃO DA ÁRVORE
@@ -47,16 +43,13 @@ no* cria_no() {
     return novo;
 }
 
-
 no* cria_arv_vazia() {
     return nullptr;
 }
 
-
 int arvore_vazia(no* n) {
     return n == nullptr;
 }
-
 
 int e_folha(no* n) {
 
@@ -64,23 +57,18 @@ int e_folha(no* n) {
            n->filho_esquerda == nullptr;
 }
 
-
-
 // ======================================================
 // BALANCEAMENTO AVL
 // ======================================================
 
 void balancear(no* n, no*& raiz) {
-
     no* aux = n;
-
 
     // ==================================================
     // PESOU PARA ESQUERDA
     // ==================================================
 
     if (aux->fb == 2) {
-
 
         // ---------------- LL ----------------
 
@@ -97,7 +85,6 @@ void balancear(no* n, no*& raiz) {
                 ladoAntigo = A->lado;
             }
 
-
             B->filho_direita = A;
             B->pai = P;
 
@@ -106,13 +93,11 @@ void balancear(no* n, no*& raiz) {
 
             A->lado = -1;
 
-
             if (C != nullptr) {
 
                 C->pai = A;
                 C->lado = 1;
             }
-
 
             if (P == nullptr) {
 
@@ -134,18 +119,15 @@ void balancear(no* n, no*& raiz) {
                 B->lado = -1;
             }
 
-
             A->fb = 0;
             B->fb = 0;
         }
-
 
         // ---------------- LR ----------------
 
         else if (aux->filho_esquerda->fb == -1) {
 
             no* P = aux->pai;
-
             no* A = aux;
             no* B = A->filho_esquerda;
             no* C = B->filho_direita;
@@ -155,15 +137,12 @@ void balancear(no* n, no*& raiz) {
 
 
             int fbAntigo = C->fb;
-
             int ladoAntigo = 0;
-
 
             if (P != nullptr) {
 
                 ladoAntigo = A->lado;
             }
-
 
             C->filho_esquerda = B;
             C->filho_direita = A;
@@ -194,7 +173,6 @@ void balancear(no* n, no*& raiz) {
                 E->pai = A;
                 E->lado = 1;
             }
-
 
             if (P == nullptr) {
 
@@ -247,42 +225,34 @@ void balancear(no* n, no*& raiz) {
 
     else if (aux->fb == -2) {
 
-
         // ---------------- RR ----------------
 
         if (aux->filho_direita->fb == -1) {
 
             no* P = aux->pai;
-
             no* A = aux;
             no* B = A->filho_direita;
             no* C = B->filho_esquerda;
 
-
             int ladoAntigo = 0;
-
 
             if (P != nullptr) {
 
                 ladoAntigo = A->lado;
             }
 
-
             B->filho_esquerda = A;
             B->pai = P;
 
             A->pai = B;
             A->filho_direita = C;
-
             A->lado = 1;
-
 
             if (C != nullptr) {
 
                 C->pai = A;
                 C->lado = -1;
             }
-
 
             if (P == nullptr) {
 
@@ -304,11 +274,9 @@ void balancear(no* n, no*& raiz) {
                 B->lado = 1;
             }
 
-
             A->fb = 0;
             B->fb = 0;
         }
-
 
         // ---------------- RL ----------------
 
@@ -334,24 +302,19 @@ void balancear(no* n, no*& raiz) {
                 ladoAntigo = A->lado;
             }
 
-
             C->filho_esquerda = A;
             C->filho_direita = B;
-
 
             A->pai = C;
             B->pai = C;
 
             C->pai = P;
 
-
             A->filho_direita = E;
             B->filho_esquerda = D;
 
-
             A->lado = 1;
             B->lado = -1;
-
 
             if (D != nullptr) {
 
@@ -421,32 +384,26 @@ void balancear(no* n, no*& raiz) {
 void altera_fatores(no* n, int lado, no*& raiz) {
 
     if (lado == -1) {
-
         n->fb--;
     }
 
     else {
-
         n->fb++;
     }
 
 
     if (n->fb == 0) {
-
         return;
     }
 
 
     if (n->fb == 2 || n->fb == -2) {
-
         balancear(n, raiz);
-
         return;
     }
 
 
     if (n->pai != nullptr) {
-
         altera_fatores(
             n->pai,
             n->lado,
@@ -454,8 +411,6 @@ void altera_fatores(no* n, int lado, no*& raiz) {
         );
     }
 }
-
-
 
 // ======================================================
 // INSERÇÃO
@@ -481,12 +436,10 @@ void insere(
         return;
     }
 
-
     // Palavra já existe
     if (valor == n->valor) {
 
         n->contador++;
-
 
         // Não repete a mesma linha
         if (
@@ -499,7 +452,6 @@ void insere(
 
         return;
     }
-
 
     // Vai para direita
     else if (valor > n->valor) {
@@ -516,26 +468,17 @@ void insere(
 
             n->filho_direita->linhas.push_back(linha);
 
-
             altera_fatores(
                 n,
                 n->filho_direita->lado,
                 raiz
             );
 
-
             return;
         }
 
-
-        insere(
-            valor,
-            linha,
-            n->filho_direita,
-            raiz
-        );
+        insere(valor, linha, n->filho_direita, raiz);
     }
-
 
     // Vai para esquerda
     else {
@@ -553,27 +496,13 @@ void insere(
             n->filho_esquerda->linhas.push_back(linha);
 
 
-            altera_fatores(
-                n,
-                n->filho_esquerda->lado,
-                raiz
-            );
-
-
+            altera_fatores(n, n->filho_esquerda->lado, raiz);
             return;
         }
 
-
-        insere(
-            valor,
-            linha,
-            n->filho_esquerda,
-            raiz
-        );
+        insere(valor, linha, n->filho_esquerda, raiz);
     }
 }
-
-
 
 // ======================================================
 // LIMPA A PALAVRA
@@ -582,7 +511,6 @@ void insere(
 string limpaPalavra(string palavra) {
 
     string limpa = "";
-
 
     for (char c : palavra) {
 
@@ -598,8 +526,6 @@ string limpaPalavra(string palavra) {
     return limpa;
 }
 
-
-
 // ======================================================
 // CARREGA PALAVRAS DE EXCLUSÃO
 // ======================================================
@@ -608,9 +534,7 @@ vector<string> carregaExclusao(string nomeArquivo) {
 
     vector<string> exclusao;
 
-
     ifstream arquivo(nomeArquivo);
-
 
     if (!arquivo.is_open()) {
 
@@ -620,53 +544,30 @@ vector<string> carregaExclusao(string nomeArquivo) {
         return exclusao;
     }
 
-
     string palavra_exc;
-
 
     while (arquivo >> palavra_exc) {
 
         palavra_exc = limpaPalavra(palavra_exc);
 
-
         if (!palavra_exc.empty()) {
-
             exclusao.push_back(palavra_exc);
         }
     }
 
-
-    sort(
-        exclusao.begin(),
-        exclusao.end()
-    );
-
-
+    sort(exclusao.begin(), exclusao.end());
     arquivo.close();
-
-
     return exclusao;
 }
-
-
 
 // ======================================================
 // VERIFICA SE A PALAVRA ESTÁ NA LISTA DE EXCLUSÃO
 // ======================================================
 
-bool palavraExcluida(
-    const vector<string>& exclusao,
-    const string& palavra
-) {
+bool palavraExcluida(const vector<string>& exclusao, const string& palavra) {
 
-    return binary_search(
-        exclusao.begin(),
-        exclusao.end(),
-        palavra
-    );
+    return binary_search(exclusao.begin(), exclusao.end(), palavra);
 }
-
-
 
 // ======================================================
 // LEITURA DO ARQUIVO
@@ -679,7 +580,6 @@ void leituraArquivo(
 ) {
 
     ifstream arquivo(nomeArquivo);
-
 
     if (!arquivo.is_open()) {
 
@@ -817,13 +717,10 @@ no* busca(no* n, const string& valor) {
 void mostra(no* n) {
 
     if (n == nullptr) {
-
         return;
     }
 
-
     mostra(n->filho_esquerda);
-
 
     cout << "-------------------------" << endl;
 
@@ -831,34 +728,24 @@ void mostra(no* n) {
          << n->valor
          << endl;
 
-
     cout << "FB: "
          << n->fb
          << endl;
-
 
     cout << "Quantidade: "
          << n->contador
          << endl;
 
-
     if (n->pai != nullptr) {
-
-        cout << "Pai: "
-             << n->pai->valor
-             << endl;
+        cout << "Pai: " << n->pai->valor << endl;
     }
 
     else {
-
-        cout << "Pai: nenhum (RAIZ)"
-             << endl;
+        cout << "Pai: nenhum (RAIZ)" << endl;
     }
-
 
     mostra(n->filho_direita);
 }
-
 
 // ======================================================
 // MAIN
@@ -867,17 +754,12 @@ void mostra(no* n) {
 int main() {
 
     no* n = cria_arv_vazia();
-
-
     // ----------------------------------
     // CARREGA LISTA DE EXCLUSÃO
     // ----------------------------------
 
     vector<string> exclusao =
         carregaExclusao("exclusao.txt");
-
-
-
     // ----------------------------------
     // LÊ O TEXTO E MONTA A AVL
     // ----------------------------------
@@ -888,15 +770,9 @@ int main() {
         exclusao
     );
    
-
     //mostra(n);
-    cout << "Arquivo processado!"
-         << endl;
-
-    cout << "Arvore AVL criada e balanceada."
-         << endl;
-
-
+    cout << "Arquivo processado!"<< endl
+        << "Arvore AVL criada e balanceada."<< endl;
 
     // ----------------------------------
     // CONSULTAS
@@ -906,95 +782,64 @@ int main() {
 
     char continuar = 's';
 
-
     while (
         continuar == 's' ||
         continuar == 'S'
     ) {
 
-        cout << "\n--- Busca de Palavras na Arvore ---"
-             << endl;
-
-
-        cout << "Digite uma palavra "
-             << "(ou -1 para sair): ";
-
-
+        cout << "\n--- Busca de Palavras na Arvore ---"<< endl;
+        cout << "Digite uma palavra "<< "(ou -1 para sair): "; 
         cin >> palavraConsulta;
 
-
         if (palavraConsulta == "-1") {
-
-            cout << "Saindo do programa..."
-                 << endl;
+            cout << "Saindo do programa..." << endl;
 
             break;
         }
 
-
-        palavraConsulta =
-            limpaPalavra(palavraConsulta);
-
-
+        palavraConsulta = limpaPalavra(palavraConsulta);
 
         // ----------------------------------
         // BUSCA NA AVL
         // ----------------------------------
 
-        no* resultado =
-            busca(
-                n,
-                palavraConsulta
-            );
+        auto inicio = steady_clock::now(); //steady_clock::now marca o momento de agora no cronômetro
 
+        no* resultado = busca(n, palavraConsulta);
 
+        auto fim = steady_clock::now();
+
+        auto duracao = fim - inicio;
+
+        int duracao_nanoseg = duration_cast<nanoseconds>(duracao).count();
+        // conta a duração de tempo da execução em microssegundos
 
         if (resultado == nullptr) {
-
-            cout << "Palavra nao encontrada."
-                 << endl;
+            cout << "Palavra nao encontrada."<< endl;
         }
 
         else {
 
-            cout << "\nPalavra encontrada!"
-                 << endl;
+            cout << "\nPalavra encontrada!"<< endl;
 
-
-            cout << "Ocorrencias: "
-                 << resultado->contador
-                 << endl;
-
+            cout << "Ocorrencias: "<< resultado->contador << endl;
 
             cout << "Linha(s): ";
 
-
-            for (
-                size_t i = 0;
-                i < resultado->linhas.size();
-                i++
-            ) {
+            for (size_t i = 0; i < resultado->linhas.size(); i++) {
 
                 if (i > 0) {
-
                     cout << ", ";
                 }
 
-
                 cout << resultado->linhas[i];
             }
-
-
             cout << endl;
         }
-
-
-
-        cout << "\nDeseja procurar outra palavra? (s/n): ";
-
+        cout << "Duração da busca: " << duracao_nanoseg << " nanossegundos." << endl << endl
+            << "\nDeseja procurar outra palavra? (s/n): ";
         cin >> continuar;
     }
-
 
     return 0;
 }
