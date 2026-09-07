@@ -1,0 +1,239 @@
+#include <algorithm>
+#include <cctype>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <type_traits>
+#include <vector>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+typedef struct dados{
+    string palavra;
+    int contador;
+    vector<int> linhas;
+}dado;
+
+typedef struct no{
+    struct no* pai;
+
+    dado palavras[2];
+    
+    //ponteiro para o filho com valores menores que o primeiro elemento do nó
+    struct no* p1;
+    
+    //ponteiro para o filho com valores maiores que o primeiro elemento do nó e menores que o segundo
+    struct no* p2;
+
+    // ponteiro para o próximo nó no mesmo nível
+    struct no* prox;
+}no3;
+
+no3* cria_arv_vazia(){
+    return nullptr;
+}
+
+bool arv_vazia(no3* raiz){
+    return raiz == nullptr;
+}
+
+no3* cria_no(string palavra, int i){
+    no3* no = new no3;
+    no->palavras[i].palavra = palavra;
+    no->palavras[i].contador = 1;
+    no->p1 = nullptr;
+    no->p2 = nullptr;
+    no->prox = nullptr;
+
+    return no;
+}
+
+string limpaPalavra(string palavra){
+    return 0; // mudar aqui só quando a função estiver consertada
+}
+
+no3* busca(no3* n, const string& valor){
+    return 0; // definir pra b+!!
+}
+
+vector<string> carregaExclusao(string nomeArquivo){
+
+    vector<string> exclusao;
+
+    ifstream arquivo(nomeArquivo);
+
+    if (!arquivo.is_open()) {
+
+        cout << "Erro ao abrir o arquivo de exclusao!"
+             << endl;
+
+        return exclusao;
+    }
+
+    string palavra_exc;
+
+    while (arquivo >> palavra_exc) {
+
+        palavra_exc = limpaPalavra(palavra_exc);
+
+        if (!palavra_exc.empty()) {
+            exclusao.push_back(palavra_exc);
+        }
+    }
+
+    sort(exclusao.begin(), exclusao.end());
+    arquivo.close();
+    return exclusao;
+}
+
+bool palavraExcluida(const vector<string>& exclusao, const string& palavra) {
+
+    return binary_search(exclusao.begin(), exclusao.end(), palavra);
+}
+
+// ======================================================
+// LEITURA DO ARQUIVO
+// ======================================================
+
+void leituraArquivo(string nomeArquivo, no*& raiz, const vector<string>& exclusao){
+    ifstream arquivo(nomeArquivo);
+
+    if (!arquivo.is_open()) {
+
+        cout << "Erro ao abrir o arquivo de texto!"
+             << endl;
+
+        return;
+    }
+
+    string linhaTexto;
+
+    int numeroLinha = 1;
+
+    // Lê linha por linha
+    while (getline(arquivo, linhaTexto)) {
+
+        string palavra = "";
+
+        /*
+            Percorre cada caractere da linha.
+
+            Quando encontra espaço ou pontuação,
+            termina a palavra atual.
+        */
+
+        for (size_t i = 0; i <= linhaTexto.size(); i++) {
+
+            if (i < linhaTexto.size() && isalnum(static_cast<unsigned char>(linhaTexto[i]))) {
+
+                palavra += tolower(static_cast<unsigned char>(linhaTexto[i]));
+            }
+
+            else {
+
+                if (!palavra.empty()) {
+                    // Verifica se NÃO é palavra de exclusão
+                    if (!palavraExcluida(exclusao, palavra)) {
+                        // já insere as palavras na B+
+                        insere(palavra, numeroLinha, raiz, raiz);
+                    }
+                    palavra = "";
+                }
+            }
+        }
+        numeroLinha++;
+    }
+
+    arquivo.close();
+}
+
+int main(){
+    no3* n = cria_arv_vazia();
+    // ----------------------------------
+    // CARREGA LISTA DE EXCLUSÃO
+    // ----------------------------------
+
+    vector<string> exclusao = carregaExclusao("exclusao.txt");
+    // ----------------------------------
+    // LÊ O TEXTO E MONTA A B+
+    // ----------------------------------
+
+    leituraArquivo("texto.txt", n, exclusao);
+   
+    //mostra(n);
+    cout << "Arquivo processado!"<< endl
+        << "Arvore B+ criada."<< endl;
+
+    // ----------------------------------
+    // CONSULTAS
+    // ----------------------------------
+
+    string palavraConsulta;
+
+    char continuar = 's';
+
+    while (
+        continuar == 's' ||
+        continuar == 'S'
+    ) {
+
+        cout << "\n--- Busca de Palavras na Arvore ---"<< endl;
+        cout << "Digite uma palavra "<< "(ou -1 para sair): "; 
+        cin >> palavraConsulta;
+
+        if (palavraConsulta == "-1") {
+            cout << "Saindo do programa..." << endl;
+
+            break;
+        }
+
+        palavraConsulta = limpaPalavra(palavraConsulta);
+
+        // ----------------------------------
+        // BUSCA NA AVL
+        // ----------------------------------
+
+        auto inicio = steady_clock::now(); //steady_clock::now marca o momento de agora no cronômetro
+
+        no3* resultado = busca(n, palavraConsulta);
+
+        auto fim = steady_clock::now();
+
+        auto duracao = fim - inicio;
+
+        int duracao_nanoseg = duration_cast<nanoseconds>(duracao).count();
+        // conta a duração de tempo da execução em microssegundos
+
+        if (resultado == nullptr) {
+            cout << "Palavra nao encontrada."<< endl;
+        }
+
+        else {
+
+            cout << "\nPalavra encontrada!"<< endl;
+
+            cout << "Ocorrencias: "<< resultado->contador << endl;
+
+            cout << "Linha(s): ";
+
+            for (size_t i = 0; i < resultado->linhas.size(); i++) {
+
+                if (i > 0) {
+                    cout << ", ";
+                }
+
+                cout << resultado->linhas[i];
+            }
+            cout << endl;
+        }
+        cout << "Duração da busca: " << duracao_nanoseg << " nanossegundos." << endl << endl
+            << "\nDeseja procurar outra palavra? (s/n): ";
+        cin >> continuar;
+    }
+
+
+
+    return 0;
+}
