@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 #include <chrono>
 
@@ -16,45 +17,35 @@ typedef struct dados{
     vector<int> linhas;
 }dado;
 
-typedef struct no{
-    struct no* pai;
+typedef struct No{
+    /* O vetor 'ponteiros' segue a seguinte regra:
+    1- o primeiro ponteiro é o que aponta para o pai
+    2- o segundo ponteiro aponta para o próximo nó da árvore B+
+    3- os ponteiros restantes são os intermediários dos valores no nó
+    Assim, sempre teremos uma árvore com grau + 1 ponteiros! */
+    vector<No*> ponteiros;
 
-    dado palavras[2];
-    
-    //ponteiro para o filho com valores menores que o primeiro elemento do nó
-    struct no* p1;
-    
-    //ponteiro para o filho com valores maiores que o primeiro elemento do nó e menores que o segundo
-    struct no* p2;
+    vector<dados> palavras; // aqui teremos grau - 1 palavras
+}no;
 
-    // ponteiro para o próximo nó no mesmo nível
-    struct no* prox;
-}no3;
-
-no3* cria_arv_vazia(){
+no* cria_arv_vazia(){
     return nullptr;
 }
 
-bool arv_vazia(no3* raiz){
+bool arvore_vazia(no* raiz){
     return raiz == nullptr;
 }
 
-no3* cria_no(string palavra, int i){
-    no3* no = new no3;
-    no->palavras[i].palavra = palavra;
-    no->palavras[i].contador = 1;
-    no->p1 = nullptr;
-    no->p2 = nullptr;
-    no->prox = nullptr;
-
-    return no;
+no* cria_no(){
+    no* novo = new no;
+    return novo;
 }
 
 string limpaPalavra(string palavra){
     return 0; // mudar aqui só quando a função estiver consertada
 }
 
-no3* busca(no3* n, const string& valor){
+no* busca(no* n, const string& valor){
     return 0; // definir pra b+!!
 }
 
@@ -92,6 +83,25 @@ bool palavraExcluida(const vector<string>& exclusao, const string& palavra) {
 
     return binary_search(exclusao.begin(), exclusao.end(), palavra);
 }
+
+void insere(string valor, int linha, no*& n, no*& raiz){
+    if (arvore_vazia(n)) {
+        n = cria_no();
+
+        n->palavras[0].palavra = valor;
+        n->palavras[0].contador = 1;
+        n->palavras[0].linhas.push_back(linha);
+
+        return;
+    }
+    else {
+        for (int i = 0; i < 3; i++) {
+        
+        }
+    }
+
+}
+
 
 // ======================================================
 // LEITURA DO ARQUIVO
@@ -150,7 +160,7 @@ void leituraArquivo(string nomeArquivo, no*& raiz, const vector<string>& exclusa
 }
 
 int main(){
-    no3* n = cria_arv_vazia();
+    no* n = cria_arv_vazia();
     // ----------------------------------
     // CARREGA LISTA DE EXCLUSÃO
     // ----------------------------------
@@ -197,7 +207,7 @@ int main(){
 
         auto inicio = steady_clock::now(); //steady_clock::now marca o momento de agora no cronômetro
 
-        no3* resultado = busca(n, palavraConsulta);
+        no* resultado = busca(n, palavraConsulta);
 
         auto fim = steady_clock::now();
 
