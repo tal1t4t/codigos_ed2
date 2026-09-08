@@ -375,12 +375,9 @@ void balancear(no* n, no*& raiz) {
     }
 }
 
-
-
 // ======================================================
 // ALTERA OS FATORES DE BALANCEAMENTO
 // ======================================================
-
 void altera_fatores(no* n, int lado, no*& raiz) {
 
     if (lado == -1) {
@@ -416,12 +413,7 @@ void altera_fatores(no* n, int lado, no*& raiz) {
 // INSERÇÃO
 // ======================================================
 
-void insere(
-    string valor,
-    int linha,
-    no*& n,
-    no*& raiz
-) {
+void insere(string valor, int linha, no*& n, no*& raiz){
 
     if (arvore_vazia(n)) {
 
@@ -522,7 +514,6 @@ string limpaPalavra(string palavra) {
         }
     }
 
-
     return limpa;
 }
 
@@ -589,7 +580,6 @@ void leituraArquivo(
         return;
     }
 
-
     string linhaTexto;
 
     int numeroLinha = 1;
@@ -598,9 +588,7 @@ void leituraArquivo(
     // Lê linha por linha
     while (getline(arquivo, linhaTexto)) {
 
-
         string palavra = "";
-
 
         /*
             Percorre cada caractere da linha.
@@ -609,20 +597,9 @@ void leituraArquivo(
             termina a palavra atual.
         */
 
-        for (
-            size_t i = 0;
-            i <= linhaTexto.size();
-            i++
-        ) {
+        for (size_t i = 0; i <= linhaTexto.size(); i++) {
 
-            if (
-                i < linhaTexto.size() &&
-                isalnum(
-                    static_cast<unsigned char>(
-                        linhaTexto[i]
-                    )
-                )
-            ) {
+            if (i < linhaTexto.size() && isalnum(static_cast<unsigned char>(linhaTexto[i]))) {
 
                 palavra += tolower(
                     static_cast<unsigned char>(
@@ -634,46 +611,25 @@ void leituraArquivo(
             else {
 
                 if (!palavra.empty()) {
-
-
                     // Verifica se NÃO é palavra de exclusão
-                    if (
-                        !palavraExcluida(
-                            exclusao,
-                            palavra
-                        )
-                    ) {
-
+                    if (!palavraExcluida(exclusao, palavra)) {
                         /*
                             Aqui entra SUA AVL.
 
                             A palavra é inserida
                             e automaticamente balanceada.
                         */
-
-                        insere(
-                            palavra,
-                            numeroLinha,
-                            raiz,
-                            raiz
-                        );
+                        insere(palavra, numeroLinha, raiz, raiz);
                     }
-
-
                     palavra = "";
                 }
             }
         }
-
-
         numeroLinha++;
     }
 
-
     arquivo.close();
 }
-
-
 
 // ======================================================
 // BUSCA
@@ -686,12 +642,10 @@ no* busca(no* n, const string& valor) {
         return nullptr;
     }
 
-
     if (valor == n->valor) {
 
         return n;
     }
-
 
     if (valor < n->valor) {
 
@@ -701,14 +655,11 @@ no* busca(no* n, const string& valor) {
         );
     }
 
-
     return busca(
         n->filho_direita,
         valor
     );
 }
-
-
 
 // ======================================================
 // MOSTRA A ÁRVORE
