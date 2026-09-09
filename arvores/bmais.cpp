@@ -20,7 +20,7 @@ typedef struct dados{
 typedef struct No{
     /* O vetor 'ponteiros' segue a seguinte regra:
     1- o primeiro ponteiro é o que aponta para o pai
-    2- o segundo ponteiro aponta para o próximo nó da árvore B+
+    2- o segundo ponteiro aponta para o próximo nó da árvore B+ (ou para o filho se não for folha)
     3- os ponteiros restantes são os intermediários dos valores no nó
     Assim, sempre teremos uma árvore com grau + 1 ponteiros! */
     vector<No*> ponteiros;
@@ -39,6 +39,15 @@ bool arvore_vazia(no* raiz){
 no* cria_no(){
     no* novo = new no;
     return novo;
+}
+
+bool e_folha(no* n, int GRAU){
+    for (int i = 2; i < GRAU; i++) {
+        if (n->ponteiros[i] !=nullptr) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool no_cheio(no* n, no* raiz, const int GRAU){
