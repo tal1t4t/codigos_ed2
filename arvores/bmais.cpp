@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <asm-generic/errno.h>
 #include <cctype>
 #include <fstream>
 #include <iostream>
@@ -28,16 +29,33 @@ typedef struct No{
     vector<dados> chaves; // aqui teremos grau - 1 chaves
 }no;
 
-no* cria_arv_vazia(){
-    return nullptr;
+bool arvore_vazia(no* raiz, int GRAU){
+    if (raiz->ponteiros[0] != nullptr) {
+        return false;
+    }
+    for (int i = 0; i < GRAU - 1; i++) {
+        if (raiz->chaves[i].palavra != "") {
+            return false;
+        }
+    }
+    for (int i = 0; i < GRAU + 1; i++) {
+        if (raiz->ponteiros[i] != nullptr) {
+            return false;
+        }
+    }
+    return true;
 }
 
-bool arvore_vazia(no* raiz){
-    return raiz == nullptr;
-}
-
-no* cria_no(){
+no* cria_no(const int GRAU){
     no* novo = new no;
+    novo->chaves.resize(GRAU - 1);
+    novo->ponteiros.resize(GRAU + 1);
+    for (int i = 0; i < GRAU -1; i++) {
+        novo->chaves[i].palavra = "";
+    }
+    for (int i = 0; i < GRAU + 1; i++) {
+        novo->ponteiros[i] = nullptr;
+    }
     return novo;
 }
 
@@ -48,6 +66,10 @@ bool e_folha(no* n, int GRAU){
         }
     }
     return true;
+}
+
+bool e_raiz(no* n){
+    return n->ponteiros[0] == nullptr; // não tem pai
 }
 
 bool no_cheio(no* n, no* raiz, const int GRAU){
@@ -65,6 +87,7 @@ void balancear(no* &n, no* &raiz, const int GRAU, string valor, vector<int> linh
         no* aux2 = new no;
         int i;
         bool entrada_foi = false;
+
         // distribuindo os valores nas folhas novas
         for (i = 0; i < GRAU - 1; i++) {
             if (i < GRAU/2) {
@@ -101,8 +124,64 @@ void balancear(no* &n, no* &raiz, const int GRAU, string valor, vector<int> linh
             }
         }
 
+        aux1->ponteiros[1] = aux2; // definindo o próximo do aux1
+
+        if (no_cheio(n, raiz, GRAU)) {
+            if (e_raiz(n)) {
+                n->chaves.clear();
+                n->chaves.resize(GRAU-1);
+                
+                n->chaves[0] = aux2->chaves[0];
+                n->ponteiros[2] = aux1;// valores menores que a chave 0
+                n->ponteiros[3] = aux2;//valores maiores que a chave 0
+                
+                //definindo o pai das auxiliares
+                aux1->ponteiros[0] = n;
+                aux2->ponteiros[0] = n;
+            }
+            else {
+                // balanceando recursivamente o pai do nó atual, até que todos os nós acima estejam balanceados
+                balancear(n->ponteiros[0], raiz, GRAU, aux2->chaves[0].palavra, aux2->chaves[0].linhas);
+            }
+        }
     }
     else {
+        if(!no_cheio(n, raiz, GRAU)){
+            for (int i = 0; i < GRAU - 1; i++) {
+                if (n->chaves[i].palavra == "") {
+                    n->chaves[i].palavra = valor;
+                    n->chaves[i].linhas = linha;
+                    n->chaves[i].contador = 1;
+                    break;
+                }
+            }
+
+            vector<string> aux_palavras;
+            vector<int> aux_contadores;
+            vector<vector<int>> aux_linhas;
+
+            aux_palavras.resize(GRAU - 1);
+
+            for (int i = 0; i < GRAU - 1; i++) {
+                aux_palavras[i] = n->chaves[i].palavra;
+                aux_contadores[i] = n->chaves[i].contador;
+                aux_linhas[i] = n->chaves[i].linhas;
+            }
+            sort(aux_palavras.begin(), aux_palavras.end());
+            
+            vector<no*> aux_ponteiros;
+            aux_ponteiros.resize(GRAU + 1);
+            for (int i = 0; i < GRAU + 1; i++) {
+                n->ponteiros[i] = aux_ponteiros[i];
+            }
+            
+
+
+        }
+        else {
+            
+        }
+
         if (GRAU % 2 == 0) {
             balancear(n->ponteiros[0], raiz, GRAU, n->chaves[GRAU - GRAU/2].palavra, n->chaves[GRAU - GRAU/2].linhas);
         
@@ -176,8 +255,8 @@ bool palavraExcluida(const vector<string>& exclusao, const string& palavra) {
 }
 
 void insere(string valor, int linha, no*& n, no*& raiz, const int GRAU){
-    if (arvore_vazia(n)) {
-        n = cria_no();
+    if (arvore_vazia(n, GRAU)) {
+        n = cria_no(GRAU);
 
         n->chaves[0].palavra = valor;
         n->chaves[0].contador = 1;
@@ -190,12 +269,14 @@ void insere(string valor, int linha, no*& n, no*& raiz, const int GRAU){
         linhas.push_back(linha);
         balancear(n, raiz, GRAU, valor, linhas);
     }
-    else {//ainda tem espaço pra inserir no nó
+    else if (!no_cheio(n, raiz, GRAU)) {
+    
+    }//ainda tem espaço pra inserir no nó
         /*
             ordenar nó ao inserir 
         */
         return;
-    }
+    
 
 }
 
@@ -269,9 +350,7 @@ int main(){
 
     int const GRAU = num;
 
-    no* n = cria_arv_vazia();
-    n->ponteiros.resize(GRAU + 1);
-    n->chaves.resize(GRAU - 1);
+    no* n = cria_no(GRAU);
 
     // ----------------------------------
     // CARREGA LISTA DE EXCLUSÃO
